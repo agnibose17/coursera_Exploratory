@@ -1,0 +1,23 @@
+
+library(date)
+library(dplyr)
+
+hpc <- read.csv("C:/Users/agnib/Downloads/exdata_data_household_power_consumption/household_power_consumption.txt", sep=";")
+dim(hpc)
+names(hpc)
+
+
+
+hpc$DT<-paste (hpc$Date,hpc$Time,sep=" ")
+hpc$Datetime<-strptime(hpc$DT,format="%d/%m/%Y %H:%M:%S")
+hpc$D<-as.Date(hpc$Datetime)
+hpc$Day<-weekdays(hpc$D)
+hpcs<-hpc%>% filter(D =="2007-02-01"|D=="2007-02-02")
+
+hpcs$gap<-as.numeric(hpcs$Global_active_power)
+hpcs$T<-strptime(hpcs$Time,format="%H:%M:%S")
+plot(hpcs$Datetime, hpcs$gap,xaxt='n',xlab="", ylab = "Global Active Power (kilowatts)", type = "l")
+days <- seq(from = hpcs$Datetime[1], to = as.POSIXlt(as.POSIXct(hpcs$Datetime[2880]+60)), by = "day")
+axis(1, at = days, labels = format(days,"%A"))
+dev.copy(png,filename='plot2.png',width=480,height=480,units='px')
+dev.off()
